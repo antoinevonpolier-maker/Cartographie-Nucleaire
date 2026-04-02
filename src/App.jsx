@@ -193,7 +193,267 @@ const DATA = {
 
 const CATEGORIES = Object.keys(DATA);
 
-export default function App() {
+
+const TOTAL_ENTITIES = Object.values(DATA).reduce((sum, section) => sum + section.items.length, 0);
+
+const QUICK_STATS = [
+  { v: "57", l: "Réacteurs REP" },
+  { v: "18", l: "Centrales" },
+  { v: "373 TWh", l: "Production 2025" },
+  { v: "63 GW", l: "Puissance installée" },
+  { v: "3 200", l: "Entreprises" },
+  { v: "250 000", l: "Emplois (2025)" },
+  { v: "~67 Md€", l: "Devis EPR2" },
+  { v: "~1 Md€", l: "France 2030 SMR" },
+];
+
+function AppHeader({ view, setView }) {
+  return (
+    <div style={{ position: "sticky", top: 0, zIndex: 10, backdropFilter: "blur(14px)", background: "rgba(245,247,251,0.78)", borderBottom: "1px solid rgba(148,163,184,0.16)" }}>
+      <div style={{ maxWidth: 1260, margin: "0 auto", padding: "14px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+        <div>
+          <div style={{ fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", color: "#64748b", fontWeight: 700 }}>Cartographie interactive</div>
+          <div style={{ fontSize: 20, fontWeight: 700, color: "#0f172a" }}>Nucléaire français</div>
+        </div>
+
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <button onClick={() => setView("chooser")} style={topButtonStyle(view === "chooser", "#0f172a")}>Accueil</button>
+          <button onClick={() => setView("map")} style={topButtonStyle(view === "map", "#6d28d9")}>Carte mentale</button>
+          <button onClick={() => setView("list")} style={topButtonStyle(view === "list", "#0f766e")}>Vue détaillée</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HomeChooser({ setView }) {
+  return (
+    <div style={{ maxWidth: 1180, margin: "0 auto", padding: "44px 18px 60px" }}>
+      <div style={{ background: "radial-gradient(circle at top left, rgba(109,40,217,0.12), transparent 34%), radial-gradient(circle at top right, rgba(14,165,233,0.12), transparent 30%), linear-gradient(135deg, #ffffff 0%, #f8fbff 100%)", border: "1px solid rgba(148,163,184,0.18)", borderRadius: 30, padding: "28px 24px", boxShadow: "0 24px 60px rgba(15,23,42,0.08)" }}>
+        <div style={{ maxWidth: 760, margin: "0 auto", textAlign: "center" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, borderRadius: 999, padding: "8px 14px", background: "rgba(255,255,255,0.72)", border: "1px solid rgba(148,163,184,0.18)", color: "#475569", fontSize: 12, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase" }}>
+            <span>⚛</span>
+            <span>{TOTAL_ENTITIES} entités · 12 catégories · données 2025/2026</span>
+          </div>
+          <h1 style={{ margin: "18px 0 10px", fontSize: "clamp(30px, 5vw, 56px)", lineHeight: 1.03, color: "#0f172a" }}>Choisis ta façon d’explorer la filière nucléaire française</h1>
+          <p style={{ margin: "0 auto", maxWidth: 660, fontSize: 17, lineHeight: 1.65, color: "#475569" }}>
+            Une entrée plus visuelle et plus ludique, ou la vue détaillée actuelle pour lire toutes les fiches.
+          </p>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 18, marginTop: 28 }}>
+          <button onClick={() => setView("map")} style={{ ...choiceCardStyle, background: "linear-gradient(145deg, #faf5ff 0%, #eef2ff 100%)" }}>
+            <div style={{ ...iconBubbleStyle, background: "linear-gradient(135deg, #7c3aed, #4f46e5)" }}>🧠</div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: "#1e1b4b" }}>Carte mentale</div>
+            <div style={{ fontSize: 15, lineHeight: 1.65, color: "#4338ca" }}>Une navigation par grands pôles, avec nœuds colorés, connexions visuelles et exploration plus immersive.</div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <span style={tagPillStyle("#ede9fe", "#5b21b6")}>Visuelle</span>
+              <span style={tagPillStyle("#ede9fe", "#5b21b6")}>Ludique</span>
+              <span style={tagPillStyle("#ede9fe", "#5b21b6")}>Exploration libre</span>
+            </div>
+            <div style={{ marginTop: "auto", fontWeight: 700, color: "#5b21b6" }}>Ouvrir la carte mentale →</div>
+          </button>
+
+          <button onClick={() => setView("list")} style={{ ...choiceCardStyle, background: "linear-gradient(145deg, #f0fdfa 0%, #f8fafc 100%)" }}>
+            <div style={{ ...iconBubbleStyle, background: "linear-gradient(135deg, #0f766e, #06b6d4)" }}>🗂</div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: "#134e4a" }}>Vue détaillée</div>
+            <div style={{ fontSize: 15, lineHeight: 1.65, color: "#0f766e" }}>La vue actuelle avec recherche, filtres, cartes d’informations et lecture complète de chaque acteur.</div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <span style={tagPillStyle("#ccfbf1", "#0f766e")}>Précise</span>
+              <span style={tagPillStyle("#ccfbf1", "#0f766e")}>Recherche</span>
+              <span style={tagPillStyle("#ccfbf1", "#0f766e")}>Fiches complètes</span>
+            </div>
+            <div style={{ marginTop: "auto", fontWeight: 700, color: "#0f766e" }}>Ouvrir la vue détaillée →</div>
+          </button>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginTop: 18 }}>
+        {QUICK_STATS.map((s) => (
+          <div key={s.l} style={{ background: "rgba(255,255,255,0.75)", borderRadius: 20, padding: "14px 16px", border: "1px solid rgba(148,163,184,0.18)", boxShadow: "0 12px 30px rgba(15,23,42,0.05)" }}>
+            <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a" }}>{s.v}</div>
+            <div style={{ fontSize: 12, color: "#64748b", marginTop: 3 }}>{s.l}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MindMapView() {
+  const [activeCat, setActiveCat] = useState(CATEGORIES[0]);
+  const [activeItemIndex, setActiveItemIndex] = useState(0);
+
+  const activeSection = DATA[activeCat];
+  const activeItem = activeSection.items[activeItemIndex] || activeSection.items[0];
+
+  const positions = useMemo(() => {
+    const centerX = 460;
+    const centerY = 310;
+    const radiusX = 315;
+    const radiusY = 220;
+
+    return CATEGORIES.map((key, index) => {
+      const angle = -Math.PI / 2 + (2 * Math.PI * index) / CATEGORIES.length;
+      return {
+        key,
+        x: centerX + Math.cos(angle) * radiusX,
+        y: centerY + Math.sin(angle) * radiusY,
+      };
+    });
+  }, []);
+
+  const exploreRandom = () => {
+    const randomCat = CATEGORIES[Math.floor(Math.random() * CATEGORIES.length)];
+    const items = DATA[randomCat].items;
+    const randomItemIndex = Math.floor(Math.random() * items.length);
+    setActiveCat(randomCat);
+    setActiveItemIndex(randomItemIndex);
+  };
+
+  return (
+    <div style={{ maxWidth: 1280, margin: "0 auto", padding: "26px 18px 52px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 14, flexWrap: "wrap", marginBottom: 18 }}>
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#6d28d9", letterSpacing: ".08em", textTransform: "uppercase" }}>Vue immersive</div>
+          <h2 style={{ margin: "6px 0 8px", fontSize: "clamp(26px, 4vw, 40px)", color: "#0f172a" }}>Carte mentale esthétique et ludique</h2>
+          <p style={{ margin: 0, maxWidth: 760, color: "#475569", lineHeight: 1.6, fontSize: 15 }}>
+            Clique sur un grand pôle autour du noyau central, puis explore les acteurs dans le panneau en dessous. Le bouton aléatoire te fait voyager dans la carte.
+          </p>
+        </div>
+
+        <button onClick={exploreRandom} style={{ ...topButtonStyle(false, "#d97706"), background: "linear-gradient(135deg, #f59e0b, #ea580c)", color: "#fff", border: "none", boxShadow: "0 16px 34px rgba(234,88,12,0.18)" }}>
+          Explorer au hasard ✨
+        </button>
+      </div>
+
+      <div style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.92), rgba(248,250,252,0.96))", border: "1px solid rgba(148,163,184,0.18)", borderRadius: 30, padding: 18, boxShadow: "0 26px 70px rgba(15,23,42,0.08)" }}>
+        <div style={{ overflowX: "auto", paddingBottom: 6 }}>
+          <div style={{ position: "relative", minWidth: 920, height: 650, borderRadius: 24, overflow: "hidden", background: "radial-gradient(circle at center, rgba(129,140,248,0.12) 0%, rgba(255,255,255,0) 28%), radial-gradient(circle at 18% 20%, rgba(34,197,94,0.08), transparent 22%), radial-gradient(circle at 80% 20%, rgba(59,130,246,0.08), transparent 20%), linear-gradient(180deg, #ffffff, #f8fbff)" }}>
+            <svg width="920" height="650" style={{ position: "absolute", inset: 0 }}>
+              {positions.map((node) => {
+                const isActive = node.key === activeCat;
+                return (
+                  <line
+                    key={node.key}
+                    x1="460"
+                    y1="310"
+                    x2={node.x}
+                    y2={node.y}
+                    stroke={isActive ? DATA[node.key].color : "rgba(148,163,184,0.45)"}
+                    strokeWidth={isActive ? "3.5" : "1.6"}
+                    strokeDasharray={isActive ? "0" : "4 7"}
+                    strokeLinecap="round"
+                  />
+                );
+              })}
+            </svg>
+
+            <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)", width: 210, height: 210, borderRadius: "50%", background: "linear-gradient(135deg, #111827, #334155)", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: 22, boxShadow: "0 26px 50px rgba(15,23,42,0.22)" }}>
+              <div style={{ fontSize: 38, marginBottom: 4 }}>⚛</div>
+              <div style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: ".12em", opacity: 0.75 }}>Noyau</div>
+              <div style={{ fontSize: 22, fontWeight: 800, lineHeight: 1.1, marginTop: 6 }}>Nucléaire français</div>
+              <div style={{ marginTop: 10, fontSize: 12, opacity: 0.8 }}>{TOTAL_ENTITIES} entités interconnectées</div>
+            </div>
+
+            {positions.map((node) => {
+              const section = DATA[node.key];
+              const active = node.key === activeCat;
+              return (
+                <button
+                  key={node.key}
+                  onClick={() => {
+                    setActiveCat(node.key);
+                    setActiveItemIndex(0);
+                  }}
+                  style={{
+                    position: "absolute",
+                    left: node.x,
+                    top: node.y,
+                    transform: "translate(-50%, -50%)",
+                    width: active ? 180 : 164,
+                    minHeight: active ? 112 : 100,
+                    padding: "14px 16px",
+                    borderRadius: 24,
+                    border: active ? `2px solid ${section.color}` : "1px solid rgba(148,163,184,0.18)",
+                    background: active ? `linear-gradient(135deg, ${section.bg}, #ffffff)` : "rgba(255,255,255,0.92)",
+                    color: "#0f172a",
+                    boxShadow: active ? `0 20px 42px ${hexToRgba(section.color, 0.22)}` : "0 10px 24px rgba(15,23,42,0.08)",
+                    cursor: "pointer",
+                    transition: "transform .18s ease, box-shadow .18s ease, width .18s ease",
+                    textAlign: "left"
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                    <span style={{ fontSize: 23 }}>{section.icon}</span>
+                    <span style={{ fontSize: 11, fontWeight: 800, padding: "4px 8px", borderRadius: 999, background: active ? "#fff" : section.bg, color: section.color }}>{section.items.length}</span>
+                  </div>
+                  <div style={{ marginTop: 10, fontSize: 14, fontWeight: 800, lineHeight: 1.2 }}>{section.label}</div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1.1fr .95fr", gap: 16, marginTop: 18 }}>
+          <div style={panelStyle}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+              <div style={{ ...iconBubbleStyle, width: 48, height: 48, fontSize: 22, background: activeSection.bg, color: activeSection.color, boxShadow: "none" }}>{activeSection.icon}</div>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: activeSection.color, letterSpacing: ".08em", textTransform: "uppercase" }}>Catégorie active</div>
+                <div style={{ fontSize: 24, fontWeight: 800, color: "#0f172a" }}>{activeSection.label}</div>
+              </div>
+            </div>
+            <p style={{ margin: "14px 0 0", color: "#475569", lineHeight: 1.65, fontSize: 14 }}>
+              Clique sur une bulle ci-dessous pour afficher son détail. La carte est pensée comme une porte d’entrée visuelle : rapide, claire et agréable à parcourir.
+            </p>
+
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 18 }}>
+              {activeSection.items.map((item, index) => {
+                const selected = index === activeItemIndex;
+                return (
+                  <button
+                    key={item.name}
+                    onClick={() => setActiveItemIndex(index)}
+                    style={{
+                      padding: "10px 12px",
+                      borderRadius: 16,
+                      border: selected ? `1.5px solid ${activeSection.color}` : "1px solid rgba(148,163,184,0.18)",
+                      background: selected ? activeSection.bg : "#fff",
+                      color: selected ? activeSection.color : "#334155",
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      boxShadow: selected ? `0 10px 24px ${hexToRgba(activeSection.color, 0.16)}` : "none"
+                    }}
+                  >
+                    {item.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div style={{ ...panelStyle, background: "linear-gradient(180deg, #ffffff, #fbfdff)" }}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
+              <span style={{ fontSize: 11, fontWeight: 800, padding: "4px 9px", borderRadius: 999, background: activeSection.bg, color: activeSection.color }}>{activeItem.type}</span>
+              {activeItem.status && (
+                <span style={{ fontSize: 11, fontWeight: 800, padding: "4px 9px", borderRadius: 999, background: activeItem.status === "Liquidée" ? "#FCEBEB" : activeItem.status === "Difficultés" ? "#FEF3C7" : "#DCFCE7", color: activeItem.status === "Liquidée" ? "#A32D2D" : activeItem.status === "Difficultés" ? "#92400e" : "#166534" }}>{activeItem.status}</span>
+              )}
+            </div>
+            <div style={{ fontSize: 25, fontWeight: 900, color: "#0f172a", lineHeight: 1.15 }}>{activeItem.name}</div>
+            <div style={{ marginTop: 14, fontSize: 14, color: "#475569", lineHeight: 1.72 }}>{activeItem.desc}</div>
+            {activeItem.chiffres && (
+              <div style={{ marginTop: 14, display: "inline-block", padding: "7px 12px", borderRadius: 12, background: activeSection.bg, color: activeSection.color, fontSize: 12, fontWeight: 800 }}>{activeItem.chiffres}</div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ListView() {
   const [activeCat, setActiveCat] = useState("all");
   const [search, setSearch] = useState("");
   const [expandedCards, setExpandedCards] = useState({});
@@ -222,96 +482,81 @@ export default function App() {
   };
 
   return (
-    <div style={{ fontFamily: "var(--font-sans)", color: "var(--color-text-primary)", padding: "0 4px" }}>
-      <div style={{ textAlign: "center", padding: "1.5rem 0 0.5rem" }}>
-        <h1 style={{ fontSize: 22, fontWeight: 500, margin: 0 }}>Cartographie complète du nucléaire français</h1>
-        <p style={{ fontSize: 13, color: "var(--color-text-secondary)", margin: "4px 0 0" }}>
+    <div style={{ maxWidth: 1260, margin: "0 auto", padding: "26px 18px 52px" }}>
+      <div style={{ textAlign: "center", padding: "0 0 0.75rem" }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, borderRadius: 999, padding: "8px 14px", background: "rgba(255,255,255,0.82)", border: "1px solid rgba(148,163,184,0.18)", color: "#0f766e", fontSize: 12, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase" }}>
+          <span>🗂</span>
+          <span>Vue détaillée</span>
+        </div>
+        <h2 style={{ fontSize: "clamp(26px, 4vw, 42px)", fontWeight: 800, margin: "16px 0 8px", color: "#0f172a" }}>Cartographie complète du nucléaire français</h2>
+        <p style={{ fontSize: 15, color: "#64748b", margin: 0 }}>
           {totalItems} entités cartographiées — 12 catégories — données 2025/2026
         </p>
       </div>
 
-      {/* Chiffres clés */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", margin: "1rem 0" }}>
-        {[
-          { v: "57", l: "Réacteurs REP" },
-          { v: "18", l: "Centrales" },
-          { v: "373 TWh", l: "Production 2025" },
-          { v: "63 GW", l: "Puissance installée" },
-          { v: "3 200", l: "Entreprises" },
-          { v: "250 000", l: "Emplois (2025)" },
-          { v: "~67 Md€", l: "Devis EPR2" },
-          { v: "~1 Md€", l: "France 2030 SMR" },
-        ].map((s, i) => (
-          <div key={i} style={{ background: "var(--color-background-secondary)", borderRadius: "var(--border-radius-md)", padding: "8px 14px", textAlign: "center", minWidth: 80, flex: "1 1 80px", maxWidth: 130 }}>
-            <div style={{ fontSize: 17, fontWeight: 500 }}>{s.v}</div>
-            <div style={{ fontSize: 10, color: "var(--color-text-secondary)", marginTop: 1 }}>{s.l}</div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 10, margin: "1.25rem 0" }}>
+        {QUICK_STATS.map((s, i) => (
+          <div key={i} style={{ background: "rgba(255,255,255,0.84)", borderRadius: 18, padding: "10px 14px", textAlign: "center", border: "1px solid rgba(148,163,184,0.14)", boxShadow: "0 12px 30px rgba(15,23,42,0.05)" }}>
+            <div style={{ fontSize: 17, fontWeight: 800, color: "#0f172a" }}>{s.v}</div>
+            <div style={{ fontSize: 11, color: "#64748b", marginTop: 2 }}>{s.l}</div>
           </div>
         ))}
       </div>
 
-      {/* Recherche */}
       <div style={{ margin: "1rem 0", display: "flex", justifyContent: "center" }}>
         <input
           type="text"
           placeholder="Rechercher un acteur, un site, une technologie..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          style={{ width: "100%", maxWidth: 500, padding: "8px 14px", fontSize: 13, borderRadius: 20, border: "0.5px solid var(--color-border-tertiary)", background: "var(--color-background-primary)", color: "var(--color-text-primary)", fontFamily: "var(--font-sans)", outline: "none" }}
+          style={{ width: "100%", maxWidth: 580, padding: "12px 16px", fontSize: 14, borderRadius: 999, border: "1px solid rgba(148,163,184,0.18)", background: "rgba(255,255,255,0.92)", color: "var(--color-text-primary)", fontFamily: "var(--font-sans)", outline: "none", boxShadow: "0 12px 34px rgba(15,23,42,0.05)" }}
         />
       </div>
 
-      {/* Filtres */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 5, justifyContent: "center", margin: "0.75rem 0 1.25rem" }}>
-        <button onClick={() => setActiveCat("all")} style={{ fontSize: 11, padding: "4px 11px", borderRadius: 16, border: "0.5px solid " + (activeCat === "all" ? "transparent" : "var(--color-border-tertiary)"), background: activeCat === "all" ? "var(--color-text-primary)" : "transparent", color: activeCat === "all" ? "var(--color-background-primary)" : "var(--color-text-secondary)", cursor: "pointer", fontFamily: "var(--font-sans)", transition: "all .2s" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", margin: "0.75rem 0 1.6rem" }}>
+        <button onClick={() => setActiveCat("all")} style={{ ...filterButtonStyle(activeCat === "all", "#0f172a"), background: activeCat === "all" ? "#0f172a" : "rgba(255,255,255,0.86)" }}>
           Tout ({Object.values(DATA).reduce((s, d) => s + d.items.length, 0)})
         </button>
         {CATEGORIES.map(c => {
           const d = DATA[c];
           const active = activeCat === c;
           return (
-            <button key={c} onClick={() => setActiveCat(c)} style={{ fontSize: 11, padding: "4px 11px", borderRadius: 16, border: "0.5px solid " + (active ? "transparent" : "var(--color-border-tertiary)"), background: active ? d.color : "transparent", color: active ? "#fff" : "var(--color-text-secondary)", cursor: "pointer", fontFamily: "var(--font-sans)", transition: "all .2s" }}>
+            <button key={c} onClick={() => setActiveCat(c)} style={{ ...filterButtonStyle(active, d.color), background: active ? d.color : "rgba(255,255,255,0.86)" }}>
               {d.icon} {d.label.split("—")[0].split("&")[0].trim()} ({d.items.length})
             </button>
           );
         })}
       </div>
 
-      {/* Contenu */}
       {Object.entries(filteredData).map(([key, section]) => (
-        <div key={key} style={{ marginBottom: "1.75rem" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, margin: "0 0 10px 2px" }}>
-            <span style={{ fontSize: 16 }}>{section.icon}</span>
-            <span style={{ fontSize: 13, fontWeight: 500, color: section.color, textTransform: "uppercase", letterSpacing: ".6px" }}>
-              {section.label}
-            </span>
-            <span style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>({section.items.length})</span>
+        <div key={key} style={{ marginBottom: "1.85rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, margin: "0 0 12px 2px", flexWrap: "wrap" }}>
+            <span style={{ fontSize: 18 }}>{section.icon}</span>
+            <span style={{ fontSize: 14, fontWeight: 800, color: section.color, textTransform: "uppercase", letterSpacing: ".08em" }}>{section.label}</span>
+            <span style={{ fontSize: 11, color: "#64748b" }}>({section.items.length})</span>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 10 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 12 }}>
             {section.items.map((item, i) => {
               const cardKey = key + "-" + i;
               const expanded = expandedCards[cardKey];
               const isLong = item.desc.length > 220;
               return (
-                <div key={i} style={{ background: "var(--color-background-primary)", border: "0.5px solid var(--color-border-tertiary)", borderRadius: "var(--border-radius-lg)", padding: "12px 14px", transition: "border-color .2s", cursor: isLong ? "pointer" : "default" }} onClick={() => isLong && toggleExpand(cardKey)}>
-                  <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 6 }}>
-                    <span style={{ fontSize: 10, fontWeight: 500, padding: "2px 7px", borderRadius: 8, background: section.bg, color: section.color, whiteSpace: "nowrap", flexShrink: 0, marginTop: 2 }}>{item.type}</span>
-                    <span style={{ fontSize: 14, fontWeight: 500, lineHeight: 1.3 }}>{item.name}</span>
+                <div key={i} style={{ background: "rgba(255,255,255,0.92)", border: "1px solid rgba(148,163,184,0.14)", borderRadius: 22, padding: "14px 15px", transition: "transform .18s ease, box-shadow .18s ease", cursor: isLong ? "pointer" : "default", boxShadow: "0 16px 34px rgba(15,23,42,0.05)" }} onClick={() => isLong && toggleExpand(cardKey)}>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 8 }}>
+                    <span style={{ fontSize: 10, fontWeight: 800, padding: "4px 8px", borderRadius: 999, background: section.bg, color: section.color, whiteSpace: "nowrap", flexShrink: 0, marginTop: 2 }}>{item.type}</span>
+                    <span style={{ fontSize: 15, fontWeight: 800, lineHeight: 1.3, color: "#0f172a" }}>{item.name}</span>
                   </div>
-                  <div style={{ fontSize: 12, color: "var(--color-text-secondary)", lineHeight: 1.55, overflow: "hidden", maxHeight: expanded || !isLong ? "none" : 72, transition: "max-height .3s" }}>
+                  <div style={{ fontSize: 13, color: "#475569", lineHeight: 1.62, overflow: "hidden", maxHeight: expanded || !isLong ? "none" : 78, transition: "max-height .3s" }}>
                     {item.desc}
                   </div>
                   {item.chiffres && (
-                    <div style={{ marginTop: 6, fontSize: 11, fontWeight: 500, color: section.color, background: section.bg, padding: "3px 8px", borderRadius: 8, display: "inline-block" }}>
-                      {item.chiffres}
-                    </div>
+                    <div style={{ marginTop: 8, fontSize: 11, fontWeight: 800, color: section.color, background: section.bg, padding: "4px 9px", borderRadius: 10, display: "inline-block" }}>{item.chiffres}</div>
                   )}
                   {item.status && (
-                    <div style={{ marginTop: 6, fontSize: 10, padding: "2px 8px", borderRadius: 8, display: "inline-block", background: item.status === "Liquidée" ? "#FCEBEB" : item.status === "Difficultés" ? "#FAEEDA" : "#EAF3DE", color: item.status === "Liquidée" ? "#A32D2D" : item.status === "Difficultés" ? "#854F0B" : "#3B6D11" }}>
-                      {item.status}
-                    </div>
+                    <div style={{ marginTop: 8, fontSize: 11, fontWeight: 800, padding: "4px 9px", borderRadius: 999, display: "inline-block", background: item.status === "Liquidée" ? "#FCEBEB" : item.status === "Difficultés" ? "#FAEEDA" : "#EAF3DE", color: item.status === "Liquidée" ? "#A32D2D" : item.status === "Difficultés" ? "#854F0B" : "#3B6D11" }}>{item.status}</div>
                   )}
                   {isLong && (
-                    <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 4 }}>
+                    <div style={{ fontSize: 11, color: "#64748b", marginTop: 6, fontWeight: 700 }}>
                       {expanded ? "▲ réduire" : "▼ voir plus"}
                     </div>
                   )}
@@ -322,9 +567,102 @@ export default function App() {
         </div>
       ))}
 
-      <div style={{ textAlign: "center", padding: "1.5rem 0 1rem", fontSize: 11, color: "var(--color-text-tertiary)" }}>
+      <div style={{ textAlign: "center", padding: "1.5rem 0 1rem", fontSize: 11, color: "#64748b" }}>
         Sources : ASNR, EDF, CEA, GIFEN, SFEN, France 2030, CSFN, Xerfi — Données consolidées avril 2026
       </div>
+    </div>
+  );
+}
+
+function topButtonStyle(active, accent) {
+  return {
+    border: "1px solid rgba(148,163,184,0.18)",
+    background: active ? accent : "rgba(255,255,255,0.86)",
+    color: active ? "#fff" : "#334155",
+    padding: "10px 14px",
+    borderRadius: 999,
+    fontWeight: 700,
+    cursor: "pointer",
+    boxShadow: active ? `0 14px 28px ${hexToRgba(accent, 0.22)}` : "0 8px 18px rgba(15,23,42,0.05)",
+  };
+}
+
+function filterButtonStyle(active, accent) {
+  return {
+    fontSize: 12,
+    padding: "8px 12px",
+    borderRadius: 999,
+    border: active ? "1px solid transparent" : "1px solid rgba(148,163,184,0.18)",
+    color: active ? "#fff" : "#475569",
+    cursor: "pointer",
+    fontFamily: "var(--font-sans)",
+    transition: "all .2s",
+    fontWeight: 700,
+    boxShadow: active ? `0 14px 28px ${hexToRgba(accent, 0.18)}` : "0 8px 18px rgba(15,23,42,0.04)",
+  };
+}
+
+function hexToRgba(hex, alpha) {
+  const normalized = hex.replace("#", "");
+  const bigint = parseInt(normalized.length === 3 ? normalized.split("").map((c) => c + c).join("") : normalized, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+const choiceCardStyle = {
+  border: "1px solid rgba(148,163,184,0.18)",
+  borderRadius: 28,
+  padding: "22px",
+  minHeight: 270,
+  display: "flex",
+  flexDirection: "column",
+  gap: 14,
+  textAlign: "left",
+  cursor: "pointer",
+  boxShadow: "0 22px 50px rgba(15,23,42,0.06)",
+};
+
+const iconBubbleStyle = {
+  width: 56,
+  height: 56,
+  borderRadius: 18,
+  display: "grid",
+  placeItems: "center",
+  color: "#fff",
+  fontSize: 27,
+  boxShadow: "0 18px 30px rgba(79,70,229,0.22)",
+};
+
+const panelStyle = {
+  background: "rgba(255,255,255,0.92)",
+  border: "1px solid rgba(148,163,184,0.16)",
+  borderRadius: 24,
+  padding: 18,
+  boxShadow: "0 18px 42px rgba(15,23,42,0.05)",
+};
+
+function tagPillStyle(bg, color) {
+  return {
+    background: bg,
+    color,
+    borderRadius: 999,
+    padding: "7px 10px",
+    fontSize: 12,
+    fontWeight: 700,
+  };
+}
+
+export default function App() {
+  const [view, setView] = useState("chooser");
+
+  return (
+    <div style={{ minHeight: "100vh", background: "linear-gradient(180deg, #f5f7fb 0%, #eef4ff 100%)", color: "var(--color-text-primary)" }}>
+      <AppHeader view={view} setView={setView} />
+      {view === "chooser" && <HomeChooser setView={setView} />}
+      {view === "map" && <MindMapView />}
+      {view === "list" && <ListView />}
     </div>
   );
 }
