@@ -290,7 +290,7 @@ export default function App() {
             {section.items.map((item, i) => {
               const cardKey = key + "-" + i;
               const expanded = expandedCards[cardKey];
-              const isLong = item.desc.length > 160;
+              const isLong = item.desc.length > 220;
               return (
                 <div key={i} style={{ background: "var(--color-background-primary)", border: "0.5px solid var(--color-border-tertiary)", borderRadius: "var(--border-radius-lg)", padding: "12px 14px", transition: "border-color .2s", cursor: isLong ? "pointer" : "default" }} onClick={() => isLong && toggleExpand(cardKey)}>
                   <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 6 }}>
